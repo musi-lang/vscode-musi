@@ -111,7 +111,9 @@ async function formatDocumentWithCli(
 		return [];
 	}
 	const kind = formatKindForDocument(document.languageId, document.uri.fsPath);
-	if (!kind || !shouldUseCliFormatter(kind, isLspRunning, forExplicitCommand)) {
+	if (
+		!(kind && shouldUseCliFormatter(kind, isLspRunning, forExplicitCommand))
+	) {
 		return [];
 	}
 	const cliPath = findCliPath();
@@ -146,7 +148,7 @@ export class CliFormatProvider
 		this.#formatMusi = formatMusi;
 	}
 
-	async provideDocumentFormattingEdits(
+	provideDocumentFormattingEdits(
 		document: vscode.TextDocument,
 		options: vscode.FormattingOptions,
 	): Promise<vscode.TextEdit[]> {

@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { findCliPath } from "./bootstrap.ts";
 import { MsPackageCodeLensProvider } from "./codelens.ts";
 import { clearCliCache, registerCommands } from "./commands.ts";
+import { CompletionController } from "./completion/completion.ts";
 import { onConfigChange } from "./config.ts";
 import { DiagnosticsController } from "./diagnostics.ts";
 import { FormatterController } from "./formatter/formatter.ts";
@@ -12,6 +13,7 @@ let statusBar: StatusBar | undefined;
 let diagnostics: DiagnosticsController | undefined;
 let lsp: LspController | undefined;
 let formatter: FormatterController | undefined;
+let completions: CompletionController | undefined;
 
 function reportBackgroundError(action: string, error: unknown) {
 	console.error(`[musi-vscode] ${action}:`, error);
@@ -65,14 +67,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	statusBar = new StatusBar();
 	diagnostics = new DiagnosticsController(statusBar);
 	formatter = new FormatterController(context);
+	completions = new CompletionController(context);
 	lsp = new LspController(statusBar, diagnostics, (isRunning) => {
 		formatter?.setLspRunning(isRunning);
+		completions?.setLspRunning(isRunning);
 	});
 
 	context.subscriptions.push(
 		statusBar,
 		diagnostics,
 		formatter,
+		completions,
 		lsp,
 		vscode.languages.registerCodeLensProvider(
 			{ scheme: "file", pattern: "**/musi.json" },
@@ -86,6 +91,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	await lsp.start(context);
 	formatter.setLspRunning(lsp.isRunning());
+	completions.setLspRunning(lsp.isRunning());
 	await refreshCliAndStatus();
 }
 
@@ -93,5 +99,6 @@ export async function deactivate() {
 	await lsp?.stop();
 	diagnostics?.dispose();
 	formatter?.dispose();
+	completions?.dispose();
 	statusBar?.dispose();
 }

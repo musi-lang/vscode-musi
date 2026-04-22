@@ -242,7 +242,7 @@
 				"musi.lsp.enabled": {
 					"type": "boolean",
 					"default": true,
-					"description": "Start the Musi language server for hover, diagnostics, semantic highlighting, formatting, and inlay hints."
+					"description": "Start the Musi language server for hover, diagnostics, semantic highlighting, formatting, completion, and inlay hints."
 				},
 				"musi.checkOnSave": {
 					"type": "boolean",

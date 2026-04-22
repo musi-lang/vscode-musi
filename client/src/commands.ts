@@ -92,7 +92,9 @@ async function workspacePackageRootFromArgs(args: readonly unknown[]) {
 	}
 }
 
-function workspaceRequest(pkg: Awaited<ReturnType<typeof workspacePackageRootFromArgs>>) {
+function workspaceRequest(
+	pkg: Awaited<ReturnType<typeof workspacePackageRootFromArgs>>,
+) {
 	if (!pkg) {
 		return undefined;
 	}
@@ -354,7 +356,9 @@ function createCommands(
 		},
 
 		async checkWorkspace(...args: unknown[]) {
-			const request = workspaceRequest(await workspacePackageRootFromArgs(args));
+			const request = workspaceRequest(
+				await workspacePackageRootFromArgs(args),
+			);
 			if (!request) {
 				return;
 			}
@@ -362,7 +366,9 @@ function createCommands(
 		},
 
 		async buildWorkspace(...args: unknown[]) {
-			const request = workspaceRequest(await workspacePackageRootFromArgs(args));
+			const request = workspaceRequest(
+				await workspacePackageRootFromArgs(args),
+			);
 			if (!request) {
 				return;
 			}
@@ -370,7 +376,9 @@ function createCommands(
 		},
 
 		async runWorkspaceTests(...args: unknown[]) {
-			const request = workspaceRequest(await workspacePackageRootFromArgs(args));
+			const request = workspaceRequest(
+				await workspacePackageRootFromArgs(args),
+			);
 			if (!request) {
 				return;
 			}
@@ -432,9 +440,18 @@ export function registerCommands(
 		vscode.commands.registerCommand("musi.restartLsp", commands.restartLsp),
 		vscode.commands.registerCommand("musi.startLsp", commands.startLsp),
 		vscode.commands.registerCommand("musi.stopLsp", commands.stopLsp),
-		vscode.commands.registerCommand("musi.showLspOutput", commands.showLspOutput),
-		vscode.commands.registerCommand("musi.checkWorkspace", commands.checkWorkspace),
-		vscode.commands.registerCommand("musi.buildWorkspace", commands.buildWorkspace),
+		vscode.commands.registerCommand(
+			"musi.showLspOutput",
+			commands.showLspOutput,
+		),
+		vscode.commands.registerCommand(
+			"musi.checkWorkspace",
+			commands.checkWorkspace,
+		),
+		vscode.commands.registerCommand(
+			"musi.buildWorkspace",
+			commands.buildWorkspace,
+		),
 		vscode.commands.registerCommand(
 			"musi.runWorkspaceTests",
 			commands.runWorkspaceTests,

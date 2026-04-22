@@ -33,6 +33,13 @@ test("maps editor indentation options to formatter args", () => {
 	]);
 });
 
+test("does not treat .musi as source extension", () => {
+	assert.equal(
+		formatKindForDocument("plaintext", "/workspace/index.musi"),
+		undefined,
+	);
+});
+
 test("maps Markdown documents to markdown formatter args", () => {
 	assert.equal(
 		formatKindForDocument("markdown", "/workspace/README.md"),

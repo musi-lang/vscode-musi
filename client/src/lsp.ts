@@ -17,6 +17,10 @@ import type { StatusBar } from "./status.ts";
 
 type LspStateListener = (isRunning: boolean) => void;
 
+function ignoreLspState(_isRunning: boolean) {
+	return;
+}
+
 export class LspController implements vscode.Disposable {
 	#client: LanguageClient | undefined;
 	#statusBar: StatusBar;
@@ -26,7 +30,7 @@ export class LspController implements vscode.Disposable {
 	constructor(
 		statusBar: StatusBar,
 		diagnostics: DiagnosticsController,
-		onStateChange: LspStateListener = () => {},
+		onStateChange: LspStateListener = ignoreLspState,
 	) {
 		this.#statusBar = statusBar;
 		this.#diagnostics = diagnostics;

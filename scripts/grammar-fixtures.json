@@ -3,20 +3,22 @@
 		"let",
 		"rec",
 		"opaque",
-		"foreign",
+		"native",
 		"data",
 		"effect",
-		"class",
-		"instance",
+		"shape",
+		"given",
 		"handle",
-		"request",
+		"ask",
+		"answer",
 		"resume",
 		"match",
 		"quote",
 		"comptime",
-		"forall",
+		"require",
+		"known",
+		"pin",
 		"where",
-		"using",
 		"partial"
 	],
 	"requiredOperatorPatterns": [
@@ -28,6 +30,8 @@
 		"~>",
 		"\\|>",
 		"<:",
+		"<\\.\\.",
+		"<\\.\\.<",
 		"\\.\\.<",
 		"\\.\\.",
 		"\\.\\.\\.",
@@ -56,7 +60,7 @@
 		"entity.name.function.operator.fixity.musi",
 		"entity.name.function.operator.musi",
 		"variable.parameter.receiver.musi",
-		"keyword.control.effects.using.musi",
+		"keyword.control.pin.musi",
 		"keyword.operator.range.musi",
 		"variable.parameter.documentation.musi",
 		"variable.parameter.optional.documentation.musi",
@@ -144,8 +148,11 @@
 		"comptimeparam",
 		"comptimequote",
 		"comptimesafe",
-		"foreign",
-		"forall"
+		"native",
+		"shape",
+		"given",
+		"ask",
+		"pin"
 	],
 	"tokenFixtures": [
 		{
@@ -208,12 +215,12 @@
 			]
 		},
 		{
-			"name": "foreign declaration with ABI string",
-			"source": "foreign \"c\" let puts (message : CString) : Int;",
+			"name": "native declaration with ABI string",
+			"source": "native \"c\" let puts (message : CString) : Int;",
 			"checks": [
 				{
 					"line": 0,
-					"lexeme": "foreign",
+					"lexeme": "native",
 					"scope": "storage.modifier.musi"
 				},
 				{
@@ -255,24 +262,24 @@
 			]
 		},
 		{
-			"name": "using clauses",
-			"source": "let run () using { Console } := 1;\nhandle run() using Console { value => value };",
+			"name": "answer handle and pin forms",
+			"source": "let consoleAnswer := answer Console { let readLine () := resume \"ok\"; };\nlet out := handle (run();) answer consoleAnswer;\nunsafe {\n  pin value as pinned in pinned;\n};",
 			"checks": [
 				{
 					"line": 0,
-					"lexeme": "using",
-					"scope": "keyword.control.effects.using.musi"
+					"lexeme": "answer",
+					"scope": "keyword.control.effects.musi"
 				},
 				{
-					"line": 1,
-					"lexeme": "using",
-					"scope": "keyword.control.effects.using.musi"
+					"line": 3,
+					"lexeme": "pin",
+					"scope": "keyword.control.pin.musi"
 				}
 			]
 		},
 		{
 			"name": "ranges and spread",
-			"source": "let a := 1 ..< 4; let b := 1 .. 4; let c := [ ...xs ];",
+			"source": "let a := 1 ..< 4; let b := 1 .. 4; let c := 1 <.. 4; let d := 1 <..< 4; let e := [ ...xs ];",
 			"checks": [
 				{
 					"line": 0,
@@ -283,6 +290,16 @@
 					"line": 0,
 					"lexeme": "..",
 					"occurrence": 2,
+					"scope": "keyword.operator.range.musi"
+				},
+				{
+					"line": 0,
+					"lexeme": "<..",
+					"scope": "keyword.operator.range.musi"
+				},
+				{
+					"line": 0,
+					"lexeme": "<..<",
 					"scope": "keyword.operator.range.musi"
 				},
 				{
@@ -545,7 +562,7 @@
 		},
 		{
 			"name": "type constructor parameter declaration",
-			"source": "let Keeps[F : Type -> Type] := class { let keep(value : F[Int]) : F[Int]; };",
+			"source": "let Keeps[F : Type -> Type] := shape { let keep(value : F[Int]) : F[Int]; };",
 			"checks": [
 				{
 					"line": 0,
@@ -610,7 +627,7 @@
 		},
 		{
 			"name": "keyword category split",
-			"source": "export opaque let Config := data { | Enabled };\nlet Runner := class { law stable := true; };\nlet Impl := instance Runner { law stable := true; };\nunsafe { request Console.write(\"ok\") };",
+			"source": "export opaque let Config := data { | Enabled };\nlet Runner := shape { law stable := true; };\nlet Impl := given Runner { law stable := true; };\nunsafe { ask Console.write(\"ok\") };",
 			"checks": [
 				{
 					"line": 0,
@@ -634,7 +651,7 @@
 				},
 				{
 					"line": 1,
-					"lexeme": "class",
+					"lexeme": "shape",
 					"scope": "storage.type.musi"
 				},
 				{
@@ -644,7 +661,7 @@
 				},
 				{
 					"line": 2,
-					"lexeme": "instance",
+					"lexeme": "given",
 					"scope": "keyword.declaration.musi"
 				},
 				{
@@ -659,14 +676,14 @@
 				},
 				{
 					"line": 3,
-					"lexeme": "request",
+					"lexeme": "ask",
 					"scope": "keyword.control.effects.musi"
 				}
 			]
 		},
 		{
 			"name": "control keyword split",
-			"source": "let value := if ready match input { | Some(x) => x } else 0;\nhandle run() using Console { value as out => resume out };\nforall T where Eq[T];\nimport \"@std/io\";",
+			"source": "let value := if ready match input { | Some(x) => x } else 0;\nhandle run() answer consoleAnswer; resume value;\nunsafe { pin value as pinned in pinned; }; let proof [T] require Eq[T] where Eq[T] := known;\nimport \"@std/io\";",
 			"checks": [
 				{
 					"line": 0,
@@ -684,12 +701,12 @@
 					"scope": "keyword.control.effects.musi"
 				},
 				{
-					"line": 1,
-					"lexeme": "using",
-					"scope": "keyword.control.effects.using.musi"
+					"line": 2,
+					"lexeme": "pin",
+					"scope": "keyword.control.pin.musi"
 				},
 				{
-					"line": 1,
+					"line": 2,
 					"lexeme": "as",
 					"scope": "keyword.control.constraint.musi"
 				},
@@ -700,7 +717,7 @@
 				},
 				{
 					"line": 2,
-					"lexeme": "forall",
+					"lexeme": "require",
 					"scope": "keyword.control.constraint.musi"
 				},
 				{
@@ -816,7 +833,7 @@
 		},
 		{
 			"name": "exported generic functions and effect members",
-			"source": "export let abort () : Empty := request Abort.abort();\nexport opaque let Rangeable[T] := class {\n  let compare (left : T, right : T) : Int;\n  let next (value : T) : Option[T];\n};\nexport opaque let Runtime := effect {\n  let envGet (name : String) : String;\n  let envHas (name : String) : Int;\n  let envSet (name : String, value : String) : Int;\n  let processCwd () : String;\n};",
+			"source": "export let abort () : Empty := ask Abort.abort();\nexport opaque let Rangeable[T] := shape {\n  let compare (left : T, right : T) : Int;\n  let next (value : T) : Option[T];\n};\nexport opaque let Runtime := effect {\n  let envGet (name : String) : String;\n  let envHas (name : String) : Int;\n  let envSet (name : String, value : String) : Int;\n  let processCwd () : String;\n};",
 			"checks": [
 				{
 					"line": 0,
@@ -941,7 +958,7 @@
 		},
 		{
 			"name": "constants and law parameter syntax",
-			"source": "let MAX_COUNT := 3;\nlet letter := 'a';\nlet escaped := '\\n';\nlet Eq := class { law reflexive(value : T) := eq(value, value); };",
+			"source": "let MAX_COUNT := 3;\nlet letter := 'a';\nlet escaped := '\\n';\nlet Eq := shape { law reflexive(value : T) := eq(value, value); };",
 			"checks": [
 				{
 					"line": 0,
@@ -984,7 +1001,7 @@
 		"expression-dot-callable-access",
 		"expression-quote",
 		"expression-splice-all",
-		"expression-using-clause",
+		"expression-pin-action",
 		"type-expression",
 		"type-annotation",
 		"type-argument-list",
@@ -1022,7 +1039,6 @@
 		"operators",
 		"punctuation",
 		"identifiers",
-		"using-clause",
 		"dot-callable-access",
 		"type-expressions",
 		"type-operators",

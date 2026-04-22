@@ -42,12 +42,12 @@
 	"Handle Expression": {
 		"prefix": "handle",
 		"body": [
-			"handle ${1:effect}.${2:op}(${3:value}) using ${4:effect} {",
-			"\tvalue => ${5:value};",
-			"\t${2}(${6:k}) => ${0:resume ${7:value};}",
-			"};"
+			"let ${1:answerName} := answer ${2:Effect} {",
+			"\tlet ${3:op}(${4:value}: ${5:Type}) := ${6:resume ${4:value};}",
+			"};",
+			"handle (${7:work;}) answer ${1:answerName};"
 		],
-		"description": "Handler expression with request syntax"
+		"description": "Answer value plus handle expression"
 	},
 	"Quote Expression": {
 		"prefix": "quote",
@@ -96,19 +96,44 @@
 		],
 		"description": "Effect operation allowed for compile-time host handling"
 	},
-	"Foreign Let Binding": {
-		"prefix": "foreign",
+	"Native Let Binding": {
+		"prefix": "native",
 		"body": [
-			"foreign ${1:\"c\"} let ${2:name}(${3:x}: ${4:Int}) : ${5:Int};"
+			"native ${1:\"c\"} let ${2:name}(${3:x}: ${4:Int}) : ${5:Int};"
 		],
-		"description": "Foreign let binding"
+		"description": "Native let binding"
 	},
-	"Forall Type": {
-		"prefix": "forall",
+	"Shape Declaration": {
+		"prefix": "shape",
 		"body": [
-			"forall (${1:T}: Type) -> ${0:T}"
+			"let ${1:Shape}[${2:T}] := shape {",
+			"\tlaw ${3:name}(${4:value}: ${2:T}) := ${0:body};",
+			"};"
 		],
-		"description": "Forall type expression"
+		"description": "Shape declaration with law"
+	},
+	"Given Declaration": {
+		"prefix": "given",
+		"body": [
+			"let ${1:provider} := given ${2:Shape}[${3:Type}] {",
+			"\tlaw ${4:name}(${5:value}: ${3:Type}) := ${0:body};",
+			"};"
+		],
+		"description": "Contextual given provider"
+	},
+	"Ask Expression": {
+		"prefix": "ask",
+		"body": [
+			"ask ${1:Effect}.${2:op}(${0:value})"
+		],
+		"description": "Effect ask expression"
+	},
+	"Pin Action": {
+		"prefix": "pin",
+		"body": [
+			"pin ${1:value} as ${2:pinned} in ${0:body}"
+		],
+		"description": "Pin action form"
 	},
 	"Match Expression": {
 		"prefix": "match",
