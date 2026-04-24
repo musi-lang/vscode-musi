@@ -7,6 +7,7 @@ import { onConfigChange } from "./config.ts";
 import { DiagnosticsController } from "./diagnostics.ts";
 import { FormatterController } from "./formatter/formatter.ts";
 import { LspController } from "./lsp.ts";
+import { shouldAutoStartLspForDocument } from "./lsp-start.ts";
 import { StatusBar } from "./status.ts";
 
 let statusBar: StatusBar | undefined;
@@ -30,6 +31,16 @@ async function refreshCliAndStatus() {
 	await diagnostics.refreshStatusForActiveEditor();
 }
 
+async function startLspForDocument(
+	context: vscode.ExtensionContext,
+	document: vscode.TextDocument | undefined,
+) {
+	if (!(lsp && shouldAutoStartLspForDocument(document)) || lsp.isRunning()) {
+		return;
+	}
+	await lsp.start(context);
+}
+
 function registerEditorListeners(context: vscode.ExtensionContext) {
 	if (!diagnostics) {
 		return;
@@ -39,8 +50,11 @@ function registerEditorListeners(context: vscode.ExtensionContext) {
 		vscode.workspace.onDidSaveTextDocument((document) => {
 			diagnostics?.scheduleDocumentCheck(document);
 		}),
-		vscode.window.onDidChangeActiveTextEditor(() => {
-			refreshCliAndStatus().catch((error) => {
+		vscode.window.onDidChangeActiveTextEditor((editor) => {
+			(async () => {
+				await startLspForDocument(context, editor?.document);
+				await refreshCliAndStatus();
+			})().catch((error) => {
 				reportBackgroundError("refresh status", error);
 			});
 		}),
@@ -52,8 +66,13 @@ function setupConfigChangeHandler(context: vscode.ExtensionContext) {
 		onConfigChange(() => {
 			clearCliCache();
 			(async () => {
-				if (lsp) {
+				if (lsp?.isRunning()) {
 					await lsp.restart(context);
+				} else {
+					await startLspForDocument(
+						context,
+						vscode.window.activeTextEditor?.document,
+					);
 				}
 				await refreshCliAndStatus();
 			})().catch((error) => {
@@ -89,7 +108,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerEditorListeners(context);
 	setupConfigChangeHandler(context);
 
-	await lsp.start(context);
+	await startLspForDocument(context, vscode.window.activeTextEditor?.document);
 	formatter.setLspRunning(lsp.isRunning());
 	completions.setLspRunning(lsp.isRunning());
 	await refreshCliAndStatus();
