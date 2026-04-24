@@ -119,7 +119,7 @@ Musi code fences in Markdown use the `musi` or `ms` language tag:
 
 ````markdown
 ```musi
-let answer : Int := 42;
+let total : Int := 42;
 ```
 ````
 
