@@ -5,9 +5,9 @@ Musi language support for VS Code: syntax highlighting, language-server features
 ## Features
 
 - Syntax highlighting for `.ms` files and Musi fenced code blocks in Markdown
-- Diagnostics, hover, semantic highlighting, formatting, and inlay hints from `musi_lsp`
+- Diagnostics, hover, semantic highlighting, formatting, and inlay hints from `musi_lsp` for `.ms` files
 - Format Document support for Musi source files
-- CLI-backed formatting for Musi Markdown fences
+- CLI-backed formatting for Musi Markdown fences without starting the LSP
 - Package commands for run, check, build, test, format, and workspace actions
 - `musi.json` schema validation
 - Check-on-save fallback when LSP diagnostics are unavailable
@@ -60,7 +60,7 @@ Open the command palette and run:
 
 For `.ms` files, Format Document uses `musi_lsp` when the language server is running. If LSP formatting is unavailable, the extension falls back to `musi fmt`.
 
-For Markdown files, Musi fenced code blocks are formatted with `musi fmt`.
+For Markdown files, Musi fenced code blocks are formatted with `musi fmt`. Markdown formatting does not start or attach the Musi LSP.
 
 Formatter behavior comes from the owning package's `musi.json` plus VS Code formatting options where supported.
 

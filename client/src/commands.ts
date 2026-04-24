@@ -105,7 +105,6 @@ function workspaceRequest(
 }
 
 function createCommands(
-	context: vscode.ExtensionContext,
 	diagnostics: DiagnosticsController,
 	lsp: LspController,
 ): Commands {
@@ -335,13 +334,13 @@ function createCommands(
 		},
 
 		async restartLsp() {
-			const ok = await lsp.restart(context);
+			const ok = await lsp.restart();
 			const message = ok ? "Musi LSP restarted." : "Musi LSP did not start.";
 			await vscode.window.showInformationMessage(message);
 		},
 
 		async startLsp() {
-			const ok = await lsp.start(context);
+			const ok = await lsp.start();
 			const message = ok ? "Musi LSP started." : "Musi LSP did not start.";
 			await vscode.window.showInformationMessage(message);
 		},
@@ -408,7 +407,7 @@ export function registerCommands(
 	diagnostics: DiagnosticsController,
 	lsp: LspController,
 ) {
-	const commands = createCommands(context, diagnostics, lsp);
+	const commands = createCommands(diagnostics, lsp);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(

@@ -42,8 +42,7 @@
 		"vscode": "^1.75.0"
 	},
 	"activationEvents": [
-		"workspaceContains:**/musi.json",
-		"onLanguage:markdown"
+		"workspaceContains:**/musi.json"
 	],
 	"contributes": {
 		"languages": [

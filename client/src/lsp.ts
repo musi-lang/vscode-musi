@@ -24,6 +24,9 @@ function ignoreLspState(_isRunning: boolean) {
 export class LspController implements vscode.Disposable {
 	#client: LanguageClient | undefined;
 	#session = 0;
+	#startInFlight: Promise<boolean> | undefined;
+	#stopInFlight: Promise<void> | undefined;
+	#disposed = false;
 	#statusBar: StatusBar;
 	#diagnostics: DiagnosticsController;
 	#onStateChange: LspStateListener;
@@ -50,6 +53,13 @@ export class LspController implements vscode.Disposable {
 		return this.#session === session && this.#client === client;
 	}
 
+	#discardClient(client: LanguageClient) {
+		if (this.#client === client) {
+			this.#client = undefined;
+		}
+		client.dispose();
+	}
+
 	#setRunning() {
 		this.#diagnostics.setMode("manifest-only");
 		this.#statusBar.update("LSP ready", "ready");
@@ -62,7 +72,29 @@ export class LspController implements vscode.Disposable {
 		this.#onStateChange(false);
 	}
 
-	async start(context: vscode.ExtensionContext): Promise<boolean> {
+	async start(): Promise<boolean> {
+		if (this.#disposed) {
+			return false;
+		}
+		if (this.isRunning()) {
+			return true;
+		}
+		if (this.#startInFlight) {
+			return this.#startInFlight;
+		}
+
+		const start = this.#start();
+		this.#startInFlight = start;
+		try {
+			return await start;
+		} finally {
+			if (this.#startInFlight === start) {
+				this.#startInFlight = undefined;
+			}
+		}
+	}
+
+	async #start(): Promise<boolean> {
 		const session = ++this.#session;
 		const config = getConfig();
 		if (!config.lspEnabled) {
@@ -127,25 +159,26 @@ export class LspController implements vscode.Disposable {
 				return;
 			}
 			if (event.newState === State.Stopped) {
-				this.#client = undefined;
+				this.#discardClient(client);
 				this.#setStopped("LSP unavailable");
 			}
 		});
 
 		try {
-			context.subscriptions.push(client);
 			await client.start();
 			if (!this.#isCurrentSession(session, client)) {
 				await client.stop();
+				this.#discardClient(client);
 				return false;
 			}
 			this.#setRunning();
 			return true;
 		} catch (error) {
 			if (!this.#isCurrentSession(session, client)) {
+				this.#discardClient(client);
 				return false;
 			}
-			this.#client = undefined;
+			this.#discardClient(client);
 			this.#setStopped("LSP unavailable");
 			vscode.window
 				.showErrorMessage(`Failed to start Musi LSP: ${String(error)}`)
@@ -159,27 +192,39 @@ export class LspController implements vscode.Disposable {
 		}
 	}
 
-	async restart(context: vscode.ExtensionContext): Promise<boolean> {
-		const previous = this.#client;
-		this.#client = undefined;
-		this.#session += 1;
-		if (previous) {
-			await previous.stop();
-		}
-		return this.start(context);
+	async restart(): Promise<boolean> {
+		await this.stop();
+		return this.start();
 	}
 
 	async stop(): Promise<void> {
+		if (this.#stopInFlight) {
+			return this.#stopInFlight;
+		}
+		const stop = this.#stop();
+		this.#stopInFlight = stop;
+		try {
+			await stop;
+		} finally {
+			if (this.#stopInFlight === stop) {
+				this.#stopInFlight = undefined;
+			}
+		}
+	}
+
+	async #stop(): Promise<void> {
 		const client = this.#client;
 		this.#client = undefined;
 		this.#session += 1;
 		this.#setStopped("LSP stopped", "stopped");
 		if (client) {
 			await client.stop();
+			this.#discardClient(client);
 		}
 	}
 
 	dispose() {
+		this.#disposed = true;
 		this.stop().catch((error) => {
 			console.error("[musi-vscode] failed to stop LSP client:", error);
 		});

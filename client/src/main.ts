@@ -31,14 +31,11 @@ async function refreshCliAndStatus() {
 	await diagnostics.refreshStatusForActiveEditor();
 }
 
-async function startLspForDocument(
-	context: vscode.ExtensionContext,
-	document: vscode.TextDocument | undefined,
-) {
+async function startLspForDocument(document: vscode.TextDocument | undefined) {
 	if (!(lsp && shouldAutoStartLspForDocument(document)) || lsp.isRunning()) {
 		return;
 	}
-	await lsp.start(context);
+	await lsp.start();
 }
 
 function registerEditorListeners(context: vscode.ExtensionContext) {
@@ -52,7 +49,7 @@ function registerEditorListeners(context: vscode.ExtensionContext) {
 		}),
 		vscode.window.onDidChangeActiveTextEditor((editor) => {
 			(async () => {
-				await startLspForDocument(context, editor?.document);
+				await startLspForDocument(editor?.document);
 				await refreshCliAndStatus();
 			})().catch((error) => {
 				reportBackgroundError("refresh status", error);
@@ -67,12 +64,9 @@ function setupConfigChangeHandler(context: vscode.ExtensionContext) {
 			clearCliCache();
 			(async () => {
 				if (lsp?.isRunning()) {
-					await lsp.restart(context);
+					await lsp.restart();
 				} else {
-					await startLspForDocument(
-						context,
-						vscode.window.activeTextEditor?.document,
-					);
+					await startLspForDocument(vscode.window.activeTextEditor?.document);
 				}
 				await refreshCliAndStatus();
 			})().catch((error) => {
@@ -108,7 +102,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerEditorListeners(context);
 	setupConfigChangeHandler(context);
 
-	await startLspForDocument(context, vscode.window.activeTextEditor?.document);
+	await startLspForDocument(vscode.window.activeTextEditor?.document);
 	formatter.setLspRunning(lsp.isRunning());
 	completions.setLspRunning(lsp.isRunning());
 	await refreshCliAndStatus();
