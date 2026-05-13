@@ -102,6 +102,7 @@ export class LspController implements vscode.Disposable {
 			this.#setStopped("LSP disabled", "stopped");
 			return false;
 		}
+		this.#statusBar.update("Resolving LSP...", "starting");
 		const server = findLspBinary();
 		const serverPath = server.path;
 		if (!serverPath) {
@@ -125,6 +126,7 @@ export class LspController implements vscode.Disposable {
 			args: [],
 			transport: TransportKind.stdio,
 		};
+		this.#statusBar.update("Starting LSP...", "starting");
 		const clientOptions: LanguageClientOptions = {
 			documentSelector: [{ scheme: "file", language: "musi" }],
 			outputChannelName: "Musi LSP",
@@ -192,9 +194,21 @@ export class LspController implements vscode.Disposable {
 		}
 	}
 
-	async restart(): Promise<boolean> {
-		await this.stop();
-		return this.start();
+	restart(): Promise<boolean> {
+		return Promise.resolve(
+			vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Window,
+					title: "Restarting Musi language server...",
+				},
+				async (progress) => {
+					progress.report({ message: "Stopping current server..." });
+					await this.stop();
+					progress.report({ message: "Starting server..." });
+					return this.start();
+				},
+			),
+		);
 	}
 
 	async stop(): Promise<void> {
@@ -216,11 +230,12 @@ export class LspController implements vscode.Disposable {
 		const client = this.#client;
 		this.#client = undefined;
 		this.#session += 1;
-		this.#setStopped("LSP stopped", "stopped");
+		this.#setStopped(client ? "Stopping LSP..." : "LSP stopped", "stopped");
 		if (client) {
 			await client.stop();
 			this.#discardClient(client);
 		}
+		this.#setStopped("LSP stopped", "stopped");
 	}
 
 	dispose() {

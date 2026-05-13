@@ -1,17 +1,19 @@
 # Musi for Visual Studio Code
 
-Musi language support for VS Code: syntax highlighting, language-server features, formatting, and package commands for `.ms` projects.
+Musi language support for VS Code: syntax highlighting, language-server features, inlay hints, formatting, and package workflows for `.ms` projects.
 
 ## Features
 
 - Syntax highlighting for `.ms` files and Musi fenced code blocks in Markdown
-- Diagnostics, hover, semantic highlighting, formatting, and inlay hints from `musi_lsp` for `.ms` files
-- Format Document support for Musi source files
+- Diagnostics, hover, semantic highlighting, references, formatting, and inlay hints from `musi_lsp` for `.ms` files
+- Rust Analyzer style inlay hints for literal argument names and inferred binding types
+- A Musi command center for package, workspace, editor, and language-server actions
 - CLI-backed formatting for Musi Markdown fences without starting the LSP
-- Package commands for run, check, build, test, format, and workspace actions
+- Package and workspace commands for run, check, build, test, and format actions
 - `musi.json` schema validation
 - Check-on-save fallback when LSP diagnostics are unavailable
 - Named run configurations from VS Code settings
+- Status and progress feedback for package checks and language-server startup, restart, and stop flows
 
 ## Requirements
 
@@ -39,22 +41,40 @@ Files without an owning `musi.json` still get syntax highlighting. Package comma
 
 ## Commands
 
-Open the command palette and run:
+Open the command palette and run `Musi: Open Command Center` for the main workflow picker. It groups actions into:
 
-- `Musi: Run Package Entry`
-- `Musi: Check Package`
-- `Musi: Build Package`
-- `Musi: Run Package Tests`
+- Project: run, test, build, and check the owning package
+- Workspace: check, test, build, and format the workspace
+- Editor: configure inlay hints and edit run configurations
+- Language Server: show status, restart `musi_lsp`, and open LSP output
+
+Direct commands are also available:
+
+- `Musi: Run Current Package`
+- `Musi: Check Current Package`
+- `Musi: Build Current Package`
+- `Musi: Test Current Package`
 - `Musi: Format Document`
 - `Musi: Format Workspace`
 - `Musi: Check Workspace`
 - `Musi: Build Workspace`
-- `Musi: Run Workspace Tests`
-- `Musi: Show Actions`
-- `Musi: Start LSP`
-- `Musi: Stop LSP`
-- `Musi: Restart LSP`
-- `Musi: Show LSP Output`
+- `Musi: Test Workspace`
+- `Musi: Configure Inlay Hints`
+- `Musi: Show Status`
+- `Musi: Start Language Server`
+- `Musi: Stop Language Server`
+- `Musi: Restart Language Server`
+- `Musi: Show Language Server Output`
+
+## Inlay hints
+
+Musi enables editor-friendly hints by default:
+
+- Parameter name hints appear for literal arguments, such as numbers, strings, and templates.
+- Inferred type hints appear for declarations without explicit annotations.
+- Hints can be changed from `Musi: Configure Inlay Hints` without editing JSON.
+
+Use `"musi.inlayHints.parameterNames.enabled": "all"` for every positional argument, or `"none"` to hide parameter names.
 
 ## Formatting
 
@@ -76,8 +96,10 @@ Common settings:
   "musi.checkOnSave": true,
   "musi.hover.maximumLength": 500,
   "musi.inlayHints.enabled": true,
-  "musi.inlayHints.parameterNames.enabled": "none",
-  "musi.inlayHints.variableTypes.enabled": false
+  "musi.inlayHints.parameterNames.enabled": "literals",
+  "musi.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+  "musi.inlayHints.variableTypes.enabled": true,
+  "musi.inlayHints.variableTypes.suppressWhenTypeMatchesName": true
 }
 ```
 
@@ -129,10 +151,11 @@ The extension highlights these fences and formats them through `musi fmt`.
 
 If diagnostics, hover, semantic highlighting, or formatting do not appear:
 
-1. Run `Musi: Show LSP Output`.
-2. Confirm `musi_lsp` is installed or set `musi.lspPath`.
-3. Confirm the file belongs to a package with an ancestor `musi.json`.
-4. Run `Musi: Restart LSP` after changing binary paths.
+1. Run `Musi: Show Status`.
+2. Run `Musi: Show Language Server Output`.
+3. Confirm `musi_lsp` is installed or set `musi.lspPath`.
+4. Confirm the file belongs to a package with an ancestor `musi.json`.
+5. Run `Musi: Restart Language Server` after changing binary paths or inlay hint settings.
 
 If package commands fail:
 

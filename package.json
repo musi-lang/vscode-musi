@@ -100,93 +100,143 @@
 		"commands": [
 			{
 				"command": "musi.runPackageEntry",
-				"title": "Run Package Entry",
-				"category": "Musi"
+				"title": "Run Current Package",
+				"category": "Musi",
+				"shortTitle": "Run Current Package",
+				"description": "Run the entry declared by the owning musi.json."
 			},
 			{
 				"command": "musi.checkPackage",
-				"title": "Check Package",
-				"category": "Musi"
+				"title": "Check Current Package",
+				"category": "Musi",
+				"shortTitle": "Check Current Package",
+				"description": "Refresh diagnostics for the package that owns the active file."
 			},
 			{
 				"command": "musi.buildPackage",
-				"title": "Build Package",
-				"category": "Musi"
+				"title": "Build Current Package",
+				"category": "Musi",
+				"shortTitle": "Build Current Package",
+				"description": "Build the package that owns the active file."
 			},
 			{
 				"command": "musi.runPackageTests",
-				"title": "Run Package Tests",
-				"category": "Musi"
+				"title": "Test Current Package",
+				"category": "Musi",
+				"shortTitle": "Test Current Package",
+				"description": "Run tests for the package that owns the active file."
 			},
 			{
 				"command": "musi.runTask",
-				"title": "Run Task",
-				"category": "Musi"
+				"title": "Run Package Task",
+				"category": "Musi",
+				"shortTitle": "Run Package Task",
+				"description": "Choose and run a task from the owning musi.json."
 			},
 			{
 				"command": "musi.selectRunConfiguration",
 				"title": "Select Run Configuration",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Select Run Configuration",
+				"description": "Choose a named Musi run configuration."
 			},
 			{
 				"command": "musi.runWithArgs",
-				"title": "Run Package Entry With Arguments",
-				"category": "Musi"
+				"title": "Run Current Package with Arguments",
+				"category": "Musi",
+				"shortTitle": "Run Current Package with Arguments",
+				"description": "Prompt for runtime arguments and run the package entry."
 			},
 			{
 				"command": "musi.editRunConfigurations",
 				"title": "Edit Run Configurations",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Edit Run Configurations",
+				"description": "Open Musi run configuration settings."
 			},
 			{
 				"command": "musi.fmt",
 				"title": "Format Document",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Format Document",
+				"description": "Format the active Musi or Markdown document."
 			},
 			{
 				"command": "musi.showActions",
-				"title": "Show Actions",
-				"category": "Musi"
+				"title": "Open Command Center",
+				"category": "Musi",
+				"shortTitle": "Open Command Center",
+				"description": "Open the Musi command center for package, workspace, editor, and language-server actions."
 			},
 			{
 				"command": "musi.restartLsp",
-				"title": "Restart LSP",
-				"category": "Musi"
+				"title": "Restart Language Server",
+				"category": "Musi",
+				"shortTitle": "Restart Language Server",
+				"description": "Restart musi_lsp and refresh editor analysis."
 			},
 			{
 				"command": "musi.startLsp",
-				"title": "Start LSP",
-				"category": "Musi"
+				"title": "Start Language Server",
+				"category": "Musi",
+				"shortTitle": "Start Language Server",
+				"description": "Start musi_lsp for hover, references, completion, semantic tokens, formatting, and inlay hints."
 			},
 			{
 				"command": "musi.stopLsp",
-				"title": "Stop LSP",
-				"category": "Musi"
+				"title": "Stop Language Server",
+				"category": "Musi",
+				"shortTitle": "Stop Language Server",
+				"description": "Stop musi_lsp and use fallback diagnostics where available."
 			},
 			{
 				"command": "musi.showLspOutput",
-				"title": "Show LSP Output",
-				"category": "Musi"
+				"title": "Show Language Server Output",
+				"category": "Musi",
+				"shortTitle": "Show Language Server Output",
+				"description": "Open the Musi language-server log output."
 			},
 			{
 				"command": "musi.checkWorkspace",
 				"title": "Check Workspace",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Check Workspace",
+				"description": "Run diagnostics across all workspace members."
 			},
 			{
 				"command": "musi.buildWorkspace",
 				"title": "Build Workspace",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Build Workspace",
+				"description": "Build every package in the workspace."
 			},
 			{
 				"command": "musi.runWorkspaceTests",
-				"title": "Run Workspace Tests",
-				"category": "Musi"
+				"title": "Test Workspace",
+				"category": "Musi",
+				"shortTitle": "Test Workspace",
+				"description": "Run tests across every workspace member."
 			},
 			{
 				"command": "musi.fmtWorkspace",
 				"title": "Format Workspace",
-				"category": "Musi"
+				"category": "Musi",
+				"shortTitle": "Format Workspace",
+				"description": "Format every Musi source file in the workspace."
+			},
+			{
+				"command": "musi.configureInlayHints",
+				"title": "Configure Inlay Hints",
+				"shortTitle": "Configure Inlay Hints",
+				"category": "Musi",
+				"description": "Choose Musi parameter-name and inferred-type hint behavior."
+			},
+			{
+				"command": "musi.showStatus",
+				"title": "Show Status",
+				"shortTitle": "Show Status",
+				"category": "Musi",
+				"description": "Show current Musi language-server, diagnostics, and package status."
 			}
 		],
 		"keybindings": [],
@@ -194,6 +244,12 @@
 			"commandPalette": [
 				{
 					"command": "musi.fmt"
+				},
+				{
+					"command": "musi.showStatus"
+				},
+				{
+					"command": "musi.configureInlayHints"
 				},
 				{
 					"command": "musi.showActions"
@@ -231,32 +287,38 @@
 				"musi.cliPath": {
 					"type": "string",
 					"default": "musi",
-					"markdownDescription": "Path to the `musi` CLI binary. If not set, the extension searches workspace build outputs, Cargo bin, and PATH."
+					"markdownDescription": "Path to the `musi` CLI. Leave as `musi` to use workspace build outputs, Cargo bin, then PATH.",
+					"description": "CLI used for package commands, fallback diagnostics, formatting, builds, tests, and runs."
 				},
 				"musi.lspPath": {
 					"type": "string",
 					"default": "musi_lsp",
-					"markdownDescription": "Path to the `musi_lsp` binary. If not set, the extension searches workspace build outputs, Cargo bin, and PATH."
+					"markdownDescription": "Path to `musi_lsp`. Leave as `musi_lsp` to use workspace build outputs, Cargo bin, then PATH.",
+					"description": "Language server used for hover, references, semantic tokens, completion, formatting, and inlay hints."
 				},
 				"musi.lsp.enabled": {
 					"type": "boolean",
 					"default": true,
-					"description": "Start the Musi language server for hover, diagnostics, semantic highlighting, formatting, completion, and inlay hints."
+					"description": "Use the language server for editor intelligence when a Musi source file opens.",
+					"markdownDescription": "Start `musi_lsp` automatically for `.ms` files."
 				},
 				"musi.checkOnSave": {
 					"type": "boolean",
 					"default": true,
-					"description": "Run fallback CLI checks when LSP diagnostics are unavailable, and keep manifest checks active on save."
+					"description": "Keeps diagnostics useful before the language server starts or when it is stopped.",
+					"markdownDescription": "Run fallback `musi check` diagnostics on save when the language server is unavailable, and keep manifest diagnostics active."
 				},
 				"musi.hover.maximumLength": {
 					"type": "number",
 					"default": 500,
-					"description": "Maximum hover content length before Musi truncates editor hover text."
+					"description": "Raise this when inspecting long generated types; lower it for compact hovers.",
+					"markdownDescription": "Maximum hover Markdown length before the language server truncates the response."
 				},
 				"musi.inlayHints.enabled": {
 					"type": "boolean",
 					"default": true,
-					"description": "Enable Musi inlay hints when supported by the language server."
+					"description": "Master switch for parameter-name and inferred-type hints.",
+					"markdownDescription": "Enable Musi inlay hints from the language server."
 				},
 				"musi.inlayHints.parameterNames.enabled": {
 					"type": "string",
@@ -270,23 +332,27 @@
 						"Show parameter-name hints for literal-like arguments.",
 						"Show parameter-name hints for all positional arguments."
 					],
-					"default": "none",
-					"description": "Controls Musi call-site parameter-name inlay hints."
+					"default": "literals",
+					"description": "Parameter-name hints make positional calls easier to scan.",
+					"markdownDescription": "Controls call-site parameter-name hints. `literals` mirrors Rust Analyzer style by hinting values that need context."
 				},
 				"musi.inlayHints.parameterNames.suppressWhenArgumentMatchesName": {
 					"type": "boolean",
 					"default": true,
-					"description": "Suppress parameter-name inlay hints when the argument already matches the parameter name."
+					"description": "Keeps calls such as `open(path)` compact.",
+					"markdownDescription": "Hide parameter-name hints when the argument text already names the same concept."
 				},
 				"musi.inlayHints.variableTypes.enabled": {
 					"type": "boolean",
-					"default": false,
-					"description": "Show inferred-type inlay hints for bindings without explicit type annotations."
+					"default": true,
+					"description": "Useful while designing APIs or reviewing stdlib code.",
+					"markdownDescription": "Show inferred type hints for bindings without explicit type annotations."
 				},
 				"musi.inlayHints.variableTypes.suppressWhenTypeMatchesName": {
 					"type": "boolean",
 					"default": true,
-					"description": "Suppress inferred-type hints when the binding name already carries the same type information."
+					"description": "Reduces redundant hints in well-named declarations.",
+					"markdownDescription": "Hide inferred type hints when the binding name already carries the same type information."
 				},
 				"musi.runtime.args": {
 					"type": "array",
@@ -294,7 +360,8 @@
 						"type": "string"
 					},
 					"default": [],
-					"description": "Extra runtime arguments appended after `--` when running the owning package entry."
+					"description": "Applies to command-center run actions and named run configurations.",
+					"markdownDescription": "Runtime arguments appended after `--` when running the owning package entry."
 				},
 				"musi.runtime.env": {
 					"type": "object",
@@ -302,32 +369,38 @@
 						"type": "string"
 					},
 					"default": {},
-					"description": "Environment variables added to Musi package commands."
+					"description": "Merged with env files and per-run-configuration environment values.",
+					"markdownDescription": "Environment variables added to Musi package commands."
 				},
 				"musi.runtime.envFile": {
 					"type": "string",
 					"default": "",
-					"markdownDescription": "Path to an env file, resolved relative to the owning package root unless absolute."
+					"markdownDescription": "Path to an env file, resolved relative to the owning package root unless absolute.",
+					"description": "Use this for package-local environment without putting values in settings JSON."
 				},
 				"musi.runtime.cwd": {
 					"type": "string",
 					"default": "",
-					"description": "Working directory override for package commands, resolved relative to the owning package root unless absolute."
+					"description": "Defaults to the package root discovered from the active file.",
+					"markdownDescription": "Working directory for package commands, resolved relative to the owning package root unless absolute."
 				},
 				"musi.terminal.clearBeforeRun": {
 					"type": "boolean",
 					"default": false,
-					"description": "Clear the integrated terminal before running a package command."
+					"description": "Keeps repeated command-center runs easy to read.",
+					"markdownDescription": "Clear the Musi terminal before sending a command."
 				},
 				"musi.terminal.focusOnRun": {
 					"type": "boolean",
 					"default": true,
-					"description": "Focus the integrated terminal when running a package command."
+					"description": "Turn off for background build/test workflows.",
+					"markdownDescription": "Focus the integrated terminal when a Musi command starts."
 				},
 				"musi.terminal.reuseTerminal": {
 					"type": "boolean",
 					"default": true,
-					"description": "Reuse the existing Musi terminal instead of opening a new one."
+					"description": "Keeps command history in one terminal tab.",
+					"markdownDescription": "Reuse the existing Musi terminal for package commands."
 				},
 				"musi.runConfigurations": {
 					"type": "array",
@@ -381,7 +454,8 @@
 							}
 						}
 					},
-					"markdownDescription": "Named package-entry run configurations."
+					"markdownDescription": "Named package-entry run configurations shown by the command center.",
+					"description": "Use these for common entries, runtime arguments, env files, working directories, and pre-launch tasks."
 				}
 			}
 		},

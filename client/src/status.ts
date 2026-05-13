@@ -1,12 +1,18 @@
 import * as vscode from "vscode";
 
-export type StatusState = "checking" | "ready" | "error" | "stopped";
+export type StatusState =
+	| "checking"
+	| "starting"
+	| "ready"
+	| "error"
+	| "stopped";
 
 const STATE_STYLE: Record<
 	StatusState,
 	{ bg?: string; fg: string; icon: string }
 > = {
 	checking: { fg: "statusBarItem.warningForeground", icon: "$(sync~spin)" },
+	starting: { fg: "statusBarItem.warningForeground", icon: "$(rocket)" },
 	ready: { fg: "statusBarItem.prominentForeground", icon: "$(check)" },
 	error: {
 		bg: "statusBarItem.errorBackground",

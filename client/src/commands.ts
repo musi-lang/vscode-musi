@@ -21,6 +21,23 @@ type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 
 const RUNTIME_ARGS_SPLIT_REGEX = /\s+/;
 
+type JsonObject = Record<string, unknown>;
+
+interface SerializedPosition {
+	readonly line: number;
+	readonly character: number;
+}
+
+interface SerializedRange {
+	readonly start: SerializedPosition;
+	readonly end: SerializedPosition;
+}
+
+interface SerializedLocation {
+	readonly uri: string;
+	readonly range: SerializedRange;
+}
+
 interface Commands {
 	runPackageEntry: CommandHandler;
 	checkPackage: CommandHandler;
@@ -32,6 +49,9 @@ interface Commands {
 	runWithArgs: CommandHandler;
 	editRunConfigurations: CommandHandler;
 	fmt: CommandHandler;
+	showReferences: CommandHandler;
+	configureInlayHints: CommandHandler;
+	showStatus: CommandHandler;
 	showActions: CommandHandler;
 	restartLsp: CommandHandler;
 	startLsp: CommandHandler;
@@ -54,6 +74,110 @@ function activeUriFromArgs(args: readonly unknown[]): vscode.Uri | undefined {
 			: vscode.Uri.file(candidate);
 	}
 	return activeDocumentUri();
+}
+
+function isJsonObject(value: unknown): value is JsonObject {
+	return typeof value === "object" && value !== null;
+}
+
+function asNumber(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isFinite(value)
+		? value
+		: undefined;
+}
+
+function serializedPosition(value: unknown): SerializedPosition | undefined {
+	if (value instanceof vscode.Position) {
+		return { line: value["line"], character: value["character"] };
+	}
+	if (!isJsonObject(value)) {
+		return undefined;
+	}
+	const line = asNumber(value["line"]);
+	const character = asNumber(value["character"]);
+	return line === undefined || character === undefined
+		? undefined
+		: { line, character };
+}
+
+function serializedRange(value: unknown): SerializedRange | undefined {
+	if (value instanceof vscode.Range) {
+		return {
+			start: { line: value["start"].line, character: value["start"].character },
+			end: { line: value["end"].line, character: value["end"].character },
+		};
+	}
+	if (!isJsonObject(value)) {
+		return undefined;
+	}
+	const start = serializedPosition(value["start"]);
+	const end = serializedPosition(value["end"]);
+	return start && end ? { start, end } : undefined;
+}
+
+function serializedLocation(value: unknown): SerializedLocation | undefined {
+	if (value instanceof vscode.Location) {
+		return {
+			uri: value["uri"].toString(),
+			range: {
+				start: {
+					line: value["range"].start.line,
+					character: value["range"].start.character,
+				},
+				end: {
+					line: value["range"].end.line,
+					character: value["range"].end.character,
+				},
+			},
+		};
+	}
+	if (!isJsonObject(value) || typeof value["uri"] !== "string") {
+		return undefined;
+	}
+	const range = serializedRange(value["range"]);
+	return range ? { uri: value["uri"], range } : undefined;
+}
+
+function toPosition(value: unknown): vscode.Position | undefined {
+	const position = serializedPosition(value);
+	return position
+		? new vscode.Position(position.line, position.character)
+		: undefined;
+}
+
+function toRange(value: SerializedRange): vscode.Range {
+	return new vscode.Range(
+		value["start"].line,
+		value["start"].character,
+		value["end"].line,
+		value["end"].character,
+	);
+}
+
+function toLocation(value: unknown): vscode.Location | undefined {
+	const location = serializedLocation(value);
+	return location
+		? new vscode.Location(
+				vscode.Uri.parse(location.uri),
+				toRange(location.range),
+			)
+		: undefined;
+}
+
+function toReferenceLocations(value: unknown): vscode.Location[] {
+	if (!Array.isArray(value)) {
+		return [];
+	}
+	return value.flatMap((item) => {
+		const location = toLocation(item);
+		return location ? [location] : [];
+	});
+}
+
+async function restartLspAfterSettingChange(lsp: LspController) {
+	if (lsp.isRunning()) {
+		await lsp.restart();
+	}
 }
 
 async function packageRootFromArgs(args: readonly unknown[]) {
@@ -277,59 +401,223 @@ function createCommands(
 			await formatActiveDocumentWithCli();
 		},
 
-		async showActions(...args: unknown[]) {
-			const items: Array<vscode.QuickPickItem & { command: string }> = [
+		async showReferences(...args: unknown[]) {
+			const uri = activeUriFromArgs(args);
+			const position = toPosition(args[1]);
+			const locations = toReferenceLocations(args[2]);
+			if (!(uri && position && locations.length > 0)) {
+				return;
+			}
+			await vscode.commands.executeCommand(
+				"editor.action.showReferences",
+				uri,
+				position,
+				locations,
+			);
+		},
+
+		async configureInlayHints() {
+			const config = getConfig();
+			const items: Array<
+				vscode.QuickPickItem & {
+					parameterNames?: "none" | "literals" | "all";
+					variableTypes?: boolean;
+				}
+			> = [
 				{
-					label: "Restart LSP",
-					description: "Stop and start Musi language server",
-					command: "musi.restartLsp",
+					label: "$(symbol-parameter) Parameters for literals",
+					description: "Recommended",
+					detail:
+						"Show call-site names where arguments are numbers, strings, or templates.",
+					parameterNames: "literals",
 				},
 				{
-					label: "Start LSP",
-					description: "Start Musi language server",
-					command: "musi.startLsp",
+					label: "$(symbol-parameter) Parameters for all arguments",
+					detail:
+						"Show every positional argument name, useful while learning a package API.",
+					parameterNames: "all",
 				},
 				{
-					label: "Stop LSP",
-					description: "Stop Musi language server",
-					command: "musi.stopLsp",
+					label: "$(circle-slash) Hide parameter names",
+					detail: "Keep call sites compact and rely on signature help.",
+					parameterNames: "none",
 				},
 				{
-					label: "Show LSP Output",
-					description: "Open Musi LSP output channel",
-					command: "musi.showLspOutput",
-				},
-				{
-					label: "Check Package",
-					description: "Run package diagnostics",
-					command: "musi.checkPackage",
-				},
-				{
-					label: "Check Workspace",
-					description: "Run `musi check --workspace`",
-					command: "musi.checkWorkspace",
-				},
-				{
-					label: "Run Workspace Tests",
-					description: "Run `musi test --workspace`",
-					command: "musi.runWorkspaceTests",
-				},
-				{
-					label: "Build Workspace",
-					description: "Run `musi build --workspace`",
-					command: "musi.buildWorkspace",
-				},
-				{
-					label: "Format Workspace",
-					description: "Run `musi fmt --all`",
-					command: "musi.fmtWorkspace",
+					label: config.inlayHints.variableTypes
+						? "$(eye-closed) Hide inferred types"
+						: "$(symbol-type-parameter) Show inferred types",
+					detail:
+						"Toggle binding type hints for declarations without explicit annotations.",
+					variableTypes: !config.inlayHints.variableTypes,
 				},
 			];
 			const pick = await vscode.window.showQuickPick(items, {
-				placeHolder: "Select Musi action",
+				placeHolder: "Configure Musi inlay hints",
 			});
-			if (pick) {
-				await vscode.commands.executeCommand(pick.command, ...args);
+			if (!pick) {
+				return;
+			}
+			const cfg = vscode.workspace.getConfiguration("musi");
+			if (pick.parameterNames !== undefined) {
+				await cfg.update(
+					"inlayHints.parameterNames.enabled",
+					pick.parameterNames,
+					vscode.ConfigurationTarget.Workspace,
+				);
+			}
+			if (pick.variableTypes !== undefined) {
+				await cfg.update(
+					"inlayHints.variableTypes.enabled",
+					pick.variableTypes,
+					vscode.ConfigurationTarget.Workspace,
+				);
+			}
+			await restartLspAfterSettingChange(lsp);
+		},
+
+		async showStatus() {
+			const uri = activeDocumentUri();
+			const manifestPath = findOwningManifestPathForUri(uri);
+			const items: vscode.QuickPickItem[] = [
+				{
+					label: lsp.isRunning()
+						? "$(check) Language server running"
+						: "$(circle-slash) Language server stopped",
+					detail: lsp.isRunning()
+						? "Hover, completions, semantic tokens, references, formatting, and inlay hints come from musi_lsp."
+						: "Fallback CLI diagnostics are active when the language server is unavailable.",
+				},
+				{
+					label: `$(pulse) Diagnostics: ${diagnostics.mode()}`,
+					detail:
+						"Full uses CLI checks; manifest-only lets the language server own file diagnostics.",
+				},
+				{
+					label: manifestPath
+						? `$(root-folder) Package: ${manifestPath}`
+						: "$(warning) No owning musi.json",
+					detail:
+						"Commands run from the package root discovered from the active editor.",
+				},
+			];
+			await vscode.window.showQuickPick(items, {
+				placeHolder: "Musi status",
+			});
+		},
+
+		async showActions(...args: unknown[]) {
+			const items: Array<
+				vscode.QuickPickItem & { command?: string; args?: unknown[] }
+			> = [
+				{
+					label: "Project",
+					kind: vscode.QuickPickItemKind.Separator,
+				},
+				{
+					label: "$(play) Run current package",
+					description: "musi run",
+					detail:
+						"Run the entry from the owning musi.json with configured runtime arguments.",
+					command: "musi.runPackageEntry",
+				},
+				{
+					label: "$(beaker) Test current package",
+					description: "musi test",
+					detail: "Run package tests from the same root as the active file.",
+					command: "musi.runPackageTests",
+				},
+				{
+					label: "$(tools) Build current package",
+					description: "musi build",
+					detail: "Build the owning package before running or publishing it.",
+					command: "musi.buildPackage",
+				},
+				{
+					label: "$(checklist) Check current package",
+					description: "musi check",
+					detail: "Refresh diagnostics for the active package.",
+					command: "musi.checkPackage",
+				},
+				{
+					label: "Workspace",
+					kind: vscode.QuickPickItemKind.Separator,
+				},
+				{
+					label: "$(check-all) Check workspace",
+					description: "musi check --workspace",
+					detail:
+						"Run the workspace diagnostic pass from the workspace manifest.",
+					command: "musi.checkWorkspace",
+				},
+				{
+					label: "$(beaker) Test workspace",
+					description: "musi test --workspace",
+					detail: "Run all workspace package tests.",
+					command: "musi.runWorkspaceTests",
+				},
+				{
+					label: "$(package) Build workspace",
+					description: "musi build --workspace",
+					detail: "Build every workspace member.",
+					command: "musi.buildWorkspace",
+				},
+				{
+					label: "$(wand) Format workspace",
+					description: "musi fmt --all",
+					detail: "Format every Musi source file in the workspace.",
+					command: "musi.fmtWorkspace",
+				},
+				{
+					label: "Editor",
+					kind: vscode.QuickPickItemKind.Separator,
+				},
+				{
+					label: "$(symbol-parameter) Configure inlay hints",
+					description: "parameters and inferred types",
+					detail:
+						"Choose literal-only or all argument hints and toggle inferred type hints.",
+					command: "musi.configureInlayHints",
+				},
+				{
+					label: "$(json) Edit run configurations",
+					description: "settings.json",
+					detail: "Open Musi run configuration settings.",
+					command: "musi.editRunConfigurations",
+				},
+				{
+					label: "Language Server",
+					kind: vscode.QuickPickItemKind.Separator,
+				},
+				{
+					label: "$(pulse) Show status",
+					description: "LSP and diagnostics",
+					detail: "Inspect the active package, diagnostic mode, and LSP state.",
+					command: "musi.showStatus",
+				},
+				{
+					label: "$(debug-restart) Restart language server",
+					description: "musi_lsp",
+					detail:
+						"Reload language-server settings and rebuild editor analysis state.",
+					command: "musi.restartLsp",
+				},
+				{
+					label: "$(output) Show LSP output",
+					description: "logs",
+					detail: "Open the Musi language-server output channel.",
+					command: "musi.showLspOutput",
+				},
+			];
+			const pick = await vscode.window.showQuickPick(items, {
+				placeHolder: "Musi command center",
+				matchOnDescription: true,
+				matchOnDetail: true,
+			});
+			if (pick?.command) {
+				await vscode.commands.executeCommand(
+					pick.command,
+					...(pick.args ?? args),
+				);
 			}
 		},
 
@@ -435,6 +723,15 @@ export function registerCommands(
 			commands.editRunConfigurations,
 		),
 		vscode.commands.registerCommand("musi.fmt", commands.fmt),
+		vscode.commands.registerCommand(
+			"musi.showReferences",
+			commands.showReferences,
+		),
+		vscode.commands.registerCommand(
+			"musi.configureInlayHints",
+			commands.configureInlayHints,
+		),
+		vscode.commands.registerCommand("musi.showStatus", commands.showStatus),
 		vscode.commands.registerCommand("musi.showActions", commands.showActions),
 		vscode.commands.registerCommand("musi.restartLsp", commands.restartLsp),
 		vscode.commands.registerCommand("musi.startLsp", commands.startLsp),

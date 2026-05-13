@@ -61,9 +61,9 @@ const TERMINAL_DEFAULTS: TerminalConfig = {
 
 const INLAY_HINTS_DEFAULTS: InlayHintsConfig = {
 	enabled: true,
-	parameterNames: "none",
+	parameterNames: "literals",
 	parameterNamesSuppressWhenArgumentMatchesName: true,
-	variableTypes: false,
+	variableTypes: true,
 	variableTypesSuppressWhenTypeMatchesName: true,
 };
 

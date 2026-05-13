@@ -269,7 +269,17 @@ export class DiagnosticsController {
 		);
 
 		try {
-			const result = await runStructuredPackageCheck(pkg, controller.signal);
+			const result = await vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Window,
+					title: `Checking ${path.basename(pkg.rootDir)}`,
+					cancellable: false,
+				},
+				(progress) => {
+					progress.report({ message: "Running musi check" });
+					return runStructuredPackageCheck(pkg, controller.signal);
+				},
+			);
 			if (controller.signal.aborted) {
 				return;
 			}
