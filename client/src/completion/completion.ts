@@ -22,11 +22,35 @@ const SNIPPETS: readonly FallbackCompletion[] = [
 		insertText: new vscode.SnippetString("let ${1:name} := ${0:value};"),
 	},
 	{
+		label: "recur",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "recursive callable snippet",
+		insertText: new vscode.SnippetString(
+			"let recur ${1:name}(${2:value}: ${3:Type}) : ${4:Type} := ${0:body};",
+		),
+	},
+	{
+		label: "lambda",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "lambda expression snippet",
+		insertText: new vscode.SnippetString(
+			"\\(${1:value}: ${2:Type}) : ${3:Type} => ${0:value};",
+		),
+	},
+	{
 		label: "data",
 		kind: vscode.CompletionItemKind.Snippet,
-		detail: "data shape snippet",
+		detail: "sum data snippet",
 		insertText: new vscode.SnippetString(
-			"let ${1:Name} := data { ${2:field} : ${3:Type} };",
+			"let ${1:Name} := data {\n\t| ${2:Variant}(${3:value}: ${4:Type})\n};",
+		),
+	},
+	{
+		label: "dataproduct",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "product data snippet",
+		insertText: new vscode.SnippetString(
+			"let ${1:Name} := data {\n\tlet ${2:field}: ${3:Type};\n};",
 		),
 	},
 	{
@@ -34,39 +58,29 @@ const SNIPPETS: readonly FallbackCompletion[] = [
 		kind: vscode.CompletionItemKind.Snippet,
 		detail: "shape declaration snippet",
 		insertText: new vscode.SnippetString(
-			"let ${1:Shape} := shape {\n\tlet ${2:member} (${3:value} : ${4:Type}) : ${5:Type};\n};",
+			"let ${1:Shape} := shape {\n\tlet ${2:member}(${3:value}: ${4:Type}) : ${5:Type};\n};",
 		),
 	},
 	{
-		label: "given",
+		label: "defer",
 		kind: vscode.CompletionItemKind.Snippet,
-		detail: "given provider snippet",
+		detail: "defer expression snippet",
 		insertText: new vscode.SnippetString(
-			"let ${1:provider} := given ${2:Shape}[${3:Type}] {\n\tlet ${4:member} (${5:value} : ${3:Type}) := ${0:value};\n};",
+			"defer ${1:cleanup} where ${0:condition};",
 		),
 	},
 	{
-		label: "answer",
+		label: "yield",
 		kind: vscode.CompletionItemKind.Snippet,
-		detail: "answer value snippet",
-		insertText: new vscode.SnippetString(
-			"let ${1:answerName} := answer ${2:Effect} {\n\tlet ${3:op} (${4:value} : ${5:Type}) := ${0:resume ${4:value};}\n};",
-		),
-	},
-	{
-		label: "handle",
-		kind: vscode.CompletionItemKind.Snippet,
-		detail: "handle expression snippet",
-		insertText: new vscode.SnippetString(
-			"handle (${1:work;}) answer ${0:answerName};",
-		),
+		detail: "yield expression snippet",
+		insertText: new vscode.SnippetString("yield ${0:value};"),
 	},
 	{
 		label: "pin",
 		kind: vscode.CompletionItemKind.Snippet,
 		detail: "pin action snippet",
 		insertText: new vscode.SnippetString(
-			"pin ${1:value} as ${2:pinned} in ${0:body}",
+			"pin ${1:value} as ${2:pinned} in ${0:body};",
 		),
 	},
 	{
@@ -74,16 +88,34 @@ const SNIPPETS: readonly FallbackCompletion[] = [
 		kind: vscode.CompletionItemKind.Snippet,
 		detail: "match expression snippet",
 		insertText: new vscode.SnippetString(
-			"match ${1:value} (\n| ${2:pattern} => ${0:value}\n)",
+			"match ${1:value} (\n\t| ${2:pattern} => ${0:value}\n);",
 		),
 	},
 	{
-		label: "native",
+		label: "if",
 		kind: vscode.CompletionItemKind.Snippet,
-		detail: "native binding snippet",
+		detail: "if expression snippet",
 		insertText: new vscode.SnippetString(
-			'native ${1:"c"} let ${2:name} (${3:value} : ${4:Type}) : ${5:Type};',
+			"if ${1:condition} then ${2:value} else ${0:fallback};",
 		),
+	},
+	{
+		label: "unsafe",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "unsafe block snippet",
+		insertText: new vscode.SnippetString("unsafe {\n\t${0:expr;}\n};"),
+	},
+	{
+		label: "export",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "exported binding snippet",
+		insertText: new vscode.SnippetString("export let ${1:name} := ${0:value};"),
+	},
+	{
+		label: "import",
+		kind: vscode.CompletionItemKind.Snippet,
+		detail: "import expression snippet",
+		insertText: new vscode.SnippetString('import ${0:"@std"};'),
 	},
 ];
 

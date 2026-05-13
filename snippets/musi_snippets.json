@@ -6,142 +6,330 @@
 		],
 		"description": "Value binding"
 	},
-	"Let-Rec Callable": {
-		"prefix": "letrec",
+	"Let With Type": {
+		"prefix": "lettype",
 		"body": [
-			"let rec ${1:name}(${2:x}: ${3:Int}) : ${4:Int} := ${0:body};"
+			"let ${1:name} : ${2:Type} := ${0:value};"
+		],
+		"description": "Typed value binding"
+	},
+	"Let-Rec Callable": {
+		"prefix": [
+			"letrec",
+			"recur"
+		],
+		"body": [
+			"let recur ${1:name}(${2:x}: ${3:Int}) : ${4:Int} := ${0:body};"
 		],
 		"description": "Recursive callable binding"
+	},
+	"Function Declaration": {
+		"prefix": "fn",
+		"body": [
+			"let ${1:name}(${2:value}: ${3:Type}) : ${4:Type} := ${0:body};"
+		],
+		"description": "Callable declaration"
+	},
+	"Generic Function": {
+		"prefix": "fngen",
+		"body": [
+			"let ${1:name}[${2:T}](${3:value}: ${2:T}) : ${2:T} := ${0:value};"
+		],
+		"description": "Generic callable declaration"
+	},
+	"Receiver Method": {
+		"prefix": "method",
+		"body": [
+			"let (${1:self}: ${2:Type}).${3:name}(${4:value}: ${5:Type}) : ${6:Type} := ${0:body};"
+		],
+		"description": "Receiver method declaration"
+	},
+	"Where-Constrained Function": {
+		"prefix": "wherefn",
+		"body": [
+			"let ${1:name}[${2:T}](${3:value}: ${2:T}) : ${4:Type} where ${2:T} ~= ${5:Shape} := ${0:body};"
+		],
+		"description": "Callable declaration with where constraint"
 	},
 	"Lambda Expression": {
 		"prefix": "lambda",
 		"body": [
-			"\\(${1:x}) => ${0:body}"
+			"\\(${1:value}: ${2:Type}) : ${3:Type} => ${0:value};"
 		],
-		"description": "Lambda expression"
+		"description": "Mandatory-backslash lambda expression"
 	},
-	"Data Declaration": {
-		"prefix": "data",
+	"Mutable Binding": {
+		"prefix": "mut",
+		"body": [
+			"let ${1:name} : mut ${2:Type} := mut ${0:value};"
+		],
+		"description": "Mutable value binding"
+	},
+	"Data Sum Declaration": {
+		"prefix": [
+			"data",
+			"datasum"
+		],
 		"body": [
 			"let ${1:Type} := data {",
 			"\t| ${2:Variant}(${3:value}: ${4:Type})",
+			"\t| ${5:Other}",
 			"};"
 		],
-		"description": "Data declaration"
+		"description": "Sum data declaration"
 	},
-	"Effect Declaration": {
-		"prefix": "effect",
+	"Data Product Declaration": {
+		"prefix": "dataproduct",
 		"body": [
-			"let ${1:Effect} := effect {",
-			"\tlet ${2:op}(${3:payload}: ${4:Type}) : ${5:Type};",
-			"\tlaw ${6:name}(${7:x}: ${8:Type}) := ${0:body};",
+			"let ${1:Type} := data {",
+			"\tlet ${2:field}: ${3:Type};",
 			"};"
 		],
-		"description": "Effect declaration with operation and law"
+		"description": "Product data declaration"
 	},
-	"Handle Expression": {
-		"prefix": "handle",
+	"Data Variant Default": {
+		"prefix": "datadefault",
 		"body": [
-			"let ${1:answerName} := answer ${2:Effect} {",
-			"\tlet ${3:op}(${4:value}: ${5:Type}) := ${6:resume ${4:value};}",
-			"};",
-			"handle (${7:work;}) answer ${1:answerName};"
-		],
-		"description": "Answer value plus handle expression"
-	},
-	"Quote Expression": {
-		"prefix": "quote",
-		"body": [
-			"quote (${0:expr})"
-		],
-		"description": "Quoted expression syntax"
-	},
-	"Quote Module": {
-		"prefix": "quotemod",
-		"body": [
-			"quote {",
-			"\t${0:let value := 1;}",
-			"}"
-		],
-		"description": "Quoted module syntax"
-	},
-	"Comptime Expression": {
-		"prefix": "comptime",
-		"body": [
-			"comptime ${0:expr}"
-		],
-		"description": "Compile-time expression"
-	},
-	"Comptime Parameter": {
-		"prefix": "comptimeparam",
-		"body": [
-			"let ${1:name}(comptime ${2:n}: ${3:Int}, ${4:x}: ${5:Int}) : ${6:Int} := ${0:body};"
-		],
-		"description": "Callable with a compile-time parameter"
-	},
-	"Comptime Quote Module": {
-		"prefix": "comptimequote",
-		"body": [
-			"comptime quote {",
-			"\t${0:export let value () : Int := 1;}",
+			"let ${1:Type} := data {",
+			"\t| ${2:Variant}(${3:value}: ${4:Type}) := ${0:default}",
 			"};"
 		],
-		"description": "Compile-time quoted module expansion"
-	},
-	"Comptime-Safe Effect Operation": {
-		"prefix": "comptimesafe",
-		"body": [
-			"@comptimeSafe",
-			"let ${1:op}(${2:value}: ${3:Type}) : ${0:Type};"
-		],
-		"description": "Effect operation allowed for compile-time host handling"
-	},
-	"Native Let Binding": {
-		"prefix": "native",
-		"body": [
-			"native ${1:\"c\"} let ${2:name}(${3:x}: ${4:Int}) : ${5:Int};"
-		],
-		"description": "Native let binding"
+		"description": "Data variant with default expression"
 	},
 	"Shape Declaration": {
 		"prefix": "shape",
 		"body": [
 			"let ${1:Shape}[${2:T}] := shape {",
-			"\tlaw ${3:name}(${4:value}: ${2:T}) := ${0:body};",
+			"\tlet ${3:name}(${4:value}: ${2:T}) : ${5:Type} := ${0:body};",
 			"};"
 		],
-		"description": "Shape declaration with law"
+		"description": "Shape declaration with structural member"
 	},
-	"Given Declaration": {
-		"prefix": "given",
+	"Constrained Shape": {
+		"prefix": "shapewhere",
 		"body": [
-			"let ${1:provider} := given ${2:Shape}[${3:Type}] {",
-			"\tlaw ${4:name}(${5:value}: ${3:Type}) := ${0:body};",
+			"let ${1:Shape}[${2:T}] := shape where ${2:T} ~= ${3:Constraint} {",
+			"\tlet ${4:name}(${5:value}: ${2:T}) : ${6:Type};",
 			"};"
 		],
-		"description": "Contextual given provider"
+		"description": "Shape declaration with where constraint"
 	},
-	"Ask Expression": {
-		"prefix": "ask",
+	"Erased Capability Parameter": {
+		"prefix": "erased",
 		"body": [
-			"ask ${1:Effect}.${2:op}(${0:value})"
+			"let ${1:name}(${2:capability}: erased ${3:Shape}) : ${4:Type} := ${0:body};"
 		],
-		"description": "Effect ask expression"
+		"description": "Callable with explicit erased capability parameter"
+	},
+	"If Expression": {
+		"prefix": "if",
+		"body": [
+			"if ${1:condition} then ${2:value} else ${0:fallback};"
+		],
+		"description": "Bit conditional expression"
+	},
+	"Computation Block": {
+		"prefix": "block",
+		"body": [
+			"(",
+			"\t${1:let value := expr;}",
+			"\t${0:value}",
+			");"
+		],
+		"description": "Computation block with final expression"
+	},
+	"Tuple Expression": {
+		"prefix": "tuple",
+		"body": [
+			"(${1:first}, ${0:second});"
+		],
+		"description": "Tuple expression"
+	},
+	"Record Literal": {
+		"prefix": "record",
+		"body": [
+			"{ ${1:field} := ${0:value} };"
+		],
+		"description": "Record literal"
+	},
+	"Array Literal": {
+		"prefix": "array",
+		"body": [
+			"[${1:item}, ${0:item}];"
+		],
+		"description": "Array literal"
+	},
+	"Spread Field": {
+		"prefix": "spread",
+		"body": [
+			"...${0:value}"
+		],
+		"description": "Record or array spread"
+	},
+	"Index Access": {
+		"prefix": "index",
+		"body": [
+			"${1:value}.[${0:index}];"
+		],
+		"description": "Index access"
+	},
+	"Pipeline Expression": {
+		"prefix": "pipe",
+		"body": [
+			"${1:value} |> ${0:next};"
+		],
+		"description": "Pipeline expression"
+	},
+	"Range Expression": {
+		"prefix": "range",
+		"body": [
+			"${1:start} ..< ${0:end};"
+		],
+		"description": "Half-open range expression"
+	},
+	"Named Argument": {
+		"prefix": "arg",
+		"body": [
+			"${1:name} := ${0:value}"
+		],
+		"description": "Named argument"
+	},
+	"Optional Type": {
+		"prefix": "maybe",
+		"body": [
+			"?${0:Type}"
+		],
+		"description": "Maybe type sugar"
+	},
+	"Failure Type": {
+		"prefix": "expect",
+		"body": [
+			"${1:Error}!${0:Type}"
+		],
+		"description": "Expect type sugar"
+	},
+	"Maybe Fallback": {
+		"prefix": "fallback",
+		"body": [
+			"${1:value} ?? ${0:fallback};"
+		],
+		"description": "Maybe fallback expression"
 	},
 	"Pin Action": {
 		"prefix": "pin",
 		"body": [
-			"pin ${1:value} as ${2:pinned} in ${0:body}"
+			"pin ${1:value} as ${2:pinned} in ${0:body};"
 		],
 		"description": "Pin action form"
+	},
+	"Defer Expression": {
+		"prefix": "defer",
+		"body": [
+			"defer ${1:cleanup} where ${0:condition};"
+		],
+		"description": "Defer expression"
+	},
+	"Yield Expression": {
+		"prefix": "yield",
+		"body": [
+			"yield ${0:value};"
+		],
+		"description": "Yield expression"
+	},
+	"Import Expression": {
+		"prefix": "import",
+		"body": [
+			"import ${0:\"@std\"};"
+		],
+		"description": "Import expression"
+	},
+	"Import Block": {
+		"prefix": "importblock",
+		"body": [
+			"import (",
+			"\t${1:\"@std\"};",
+			"\t${0:\"@std/io\"};",
+			");"
+		],
+		"description": "Import block expression"
+	},
+	"Export Binding": {
+		"prefix": "export",
+		"body": [
+			"export let ${1:name} := ${0:value};"
+		],
+		"description": "Exported binding"
+	},
+	"External Declaration": {
+		"prefix": "external",
+		"body": [
+			"@external(",
+			"\tname := ${1:\"externalName\"}",
+			")",
+			"let ${2:name}(${3:value}: ${4:Type}) : ${0:Type};"
+		],
+		"description": "External import declaration"
 	},
 	"Match Expression": {
 		"prefix": "match",
 		"body": [
 			"match ${1:expr} (",
 			"\t| ${2:pattern} => ${0:result}",
-			")"
+			");"
 		],
 		"description": "Match expression"
+	},
+	"Variant Pattern": {
+		"prefix": "variantpat",
+		"body": [
+			".${1:Variant}(${2:value})"
+		],
+		"description": "Variant pattern or constructor"
+	},
+	"Refutable Let": {
+		"prefix": "letelse",
+		"body": [
+			"let ${1:pattern} := ${2:expr} else ${0:fallback};"
+		],
+		"description": "Refutable let with fallback"
+	},
+	"Unsafe Block": {
+		"prefix": "unsafe",
+		"body": [
+			"unsafe {",
+			"\t${0:expr;}",
+			"};"
+		],
+		"description": "Unsafe expression block"
+	},
+	"Line Comment": {
+		"prefix": "comment",
+		"body": [
+			"-- ${0:comment}"
+		],
+		"description": "Line comment"
+	},
+	"Block Comment": {
+		"prefix": "blockcomment",
+		"body": [
+			"/-",
+			"${0:comment}",
+			"-/"
+		],
+		"description": "Block comment"
+	},
+	"Item Documentation": {
+		"prefix": "doc",
+		"body": [
+			"--- ${0:documentation}"
+		],
+		"description": "Item documentation comment"
+	},
+	"Module Documentation": {
+		"prefix": "moddoc",
+		"body": [
+			"--! ${0:module documentation}"
+		],
+		"description": "Module documentation comment"
 	}
 }

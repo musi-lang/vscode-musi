@@ -8,8 +8,9 @@ import {
 
 test("fallback completions expose current Musi keywords", () => {
 	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("shape"));
-	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("given"));
-	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("ask"));
+	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("defer"));
+	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("yield"));
+	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("recur"));
 	assert.ok(FALLBACK_COMPLETION_KEYWORDS.includes("pin"));
 	assert.ok(!FALLBACK_COMPLETION_KEYWORDS.includes("class" as never));
 	assert.ok(!FALLBACK_COMPLETION_KEYWORDS.includes("instance" as never));
@@ -20,14 +21,19 @@ test("fallback completions expose high-value snippets", () => {
 		[...FALLBACK_COMPLETION_SNIPPETS],
 		[
 			"let",
+			"recur",
+			"lambda",
 			"data",
+			"dataproduct",
 			"shape",
-			"given",
-			"answer",
-			"handle",
+			"defer",
+			"yield",
 			"pin",
 			"match",
-			"native",
+			"if",
+			"unsafe",
+			"export",
+			"import",
 		],
 	);
 });

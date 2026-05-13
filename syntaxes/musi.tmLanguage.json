@@ -350,40 +350,18 @@
 		},
 		"declaration-all": {
 			"patterns": [
-				{ "include": "#declaration-fixity" },
-				{ "include": "#declaration-native-function" },
 				{ "include": "#declaration-let-dot-callable" },
 				{ "include": "#declaration-let-function" },
 				{ "include": "#declaration-let-value" },
 				{ "include": "#declaration-let-type" },
 				{ "include": "#declaration-type-form" },
-								{ "include": "#declaration-law" },
 				{ "include": "#declaration-member-function" },
 				{ "include": "#declaration-type-parameters" }
 			]
 		},
-		"declaration-fixity": {
-			"name": "meta.declaration.fixity.musi",
-			"match": "\\b(infixl|infixr|infix)\\b\\s+([0-9][0-9_]*)\\s*(\\((?:[*/+\\-%=<>]{1,})\\))",
-			"captures": {
-				"1": { "name": "keyword.declaration.fixity.musi" },
-				"2": { "name": "constant.numeric.decimal.musi" },
-				"3": { "name": "entity.name.function.operator.fixity.musi" }
-			}
-		},
-		"declaration-native-function": {
-			"name": "meta.declaration.native.musi",
-			"match": "\\b(native)\\b(?:\\s+(\"[^\"]+\"))?\\s+(let)\\s+([a-z_][A-Za-z0-9_]*)",
-			"captures": {
-				"1": { "name": "storage.modifier.musi" },
-				"2": { "name": "string.quoted.double.musi" },
-				"3": { "name": "keyword.declaration.musi" },
-				"4": { "name": "entity.name.function.musi" }
-			}
-		},
 		"declaration-let-function": {
 			"name": "meta.declaration.function.musi",
-			"match": "\\b(let)\\b(?:\\s+(rec)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?\\()",
+			"match": "\\b(let)\\b(?:\\s+(recur)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?\\()",
 			"captures": {
 				"1": { "name": "keyword.declaration.musi" },
 				"2": { "name": "storage.modifier.musi" },
@@ -393,7 +371,7 @@
 		},
 		"declaration-let-value": {
 			"name": "meta.declaration.value.musi",
-			"match": "\\b(let)\\b(?:\\s+(rec)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?::|:=))",
+			"match": "\\b(let)\\b(?:\\s+(recur)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?::|:=))",
 			"captures": {
 				"1": { "name": "keyword.declaration.musi" },
 				"2": { "name": "storage.modifier.musi" },
@@ -403,7 +381,7 @@
 		},
 		"declaration-let-type": {
 			"name": "meta.declaration.type.musi",
-			"match": "\\b(let)\\b(?:\\s+(rec)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([A-Z][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?:=\\s*(?:shape|data|effect|given)\\b)",
+			"match": "\\b(let)\\b(?:\\s+(recur)\\b)?(?:\\s+(\\[[^\\]\\\\n]*\\]))?\\s+([A-Z][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?:=\\s*(?:shape|data)\\b)",
 			"captures": {
 				"1": { "name": "keyword.declaration.musi" },
 				"2": { "name": "storage.modifier.musi" },
@@ -413,28 +391,20 @@
 		},
 		"declaration-type-form": {
 			"name": "meta.declaration.type.musi",
-			"match": "\\b(shape|data|effect)\\s+([A-Z][A-Za-z0-9_]*)",
+			"match": "\\b(shape|data)\\s+([A-Z][A-Za-z0-9_]*)",
 			"captures": {
 				"1": { "name": "storage.type.musi" },
 				"2": { "name": "entity.name.type.musi" }
 			}
 		},
-		"declaration-law": {
-			"name": "meta.declaration.member.law.musi",
-			"match": "\\b(law)\\b\\s+([a-z_][A-Za-z0-9_]*)",
-			"captures": {
-				"1": { "name": "keyword.declaration.musi" },
-				"2": { "name": "entity.name.function.law.musi" }
-			}
-		},
 		"declaration-member-function": {
 			"name": "meta.declaration.member.function.musi",
-			"match": "(^|[;{]\\s*)(?:let\\s+)?([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?\\([^)]*\\)\\s*(?::|:=|where\\b|require\\b))",
+			"match": "(^|[;{]\\s*)(?:let\\s+)?([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\\\n]*\\]\\s*)?\\([^)]*\\)\\s*(?::|:=|where\\b))",
 			"captures": { "2": { "name": "entity.name.function.musi" } }
 		},
 		"signature-parameter-list": {
 			"name": "meta.parameters.musi",
-			"begin": "\\((?=[^\\)\\n]*\\b(?:comptime\\s+)?(?:self|[a-z_][A-Za-z0-9_]*)\\s*:)",
+			"begin": "\\((?=[^\\)\\n]*\\b(?:self|[a-z_][A-Za-z0-9_]*)\\s*:)",
 			"end": "\\)",
 			"beginCaptures": { "0": { "name": "punctuation.section.parens.begin.musi" } },
 			"endCaptures": { "0": { "name": "punctuation.section.parens.end.musi" } },
@@ -483,7 +453,7 @@
 		"type-annotation": {
 			"name": "meta.type.annotation.musi",
 			"begin": "(:)(?![=?])\\s*",
-			"end": "(?=\\s*(?:,|;|\\)|\\}|:=|=>|\\||if\\b|require\\b|where\\b))",
+			"end": "(?=\\s*(?:,|;|\\)|\\}|:=|=>|\\||if\\b|where\\b))",
 			"beginCaptures": { "1": { "name": "punctuation.separator.colon.musi" } },
 			"patterns": [ { "include": "#type-expression" } ]
 		},
@@ -526,8 +496,9 @@
 		},
 		"type-operator-all": {
 			"patterns": [
+				{ "include": "#operator-absence-failure" },
 				{ "include": "#operator-equivalence" },
-				{ "include": "#operator-function-effect" },
+				{ "include": "#operator-fallback" },
 				{ "include": "#operator-function-pure" },
 				{ "include": "#operator-constraint" },
 				{
@@ -544,7 +515,7 @@
 				},
 				{
 					"name": "entity.name.type.parameter.musi",
-					"match": "\\b[a-z][A-Za-z0-9_]*\\b(?=\\s*(?:,|\\]|\\)|->|~>|<:|$))"
+					"match": "\\b[a-z][A-Za-z0-9_]*\\b(?=\\s*(?:,|\\]|\\)|->|<:|$))"
 				}
 			]
 		},
@@ -561,7 +532,12 @@
 		},
 		"expression-all": {
 			"patterns": [
-				{ "include": "#expression-quote" },
+				{ "include": "#expression-if" },
+				{ "include": "#expression-match" },
+				{ "include": "#expression-defer" },
+				{ "include": "#expression-yield" },
+				{ "include": "#expression-lambda" },
+				{ "include": "#expression-export" },
 				{ "include": "#expression-unsafe-block" },
 				{ "include": "#expression-splice-all" },
 				{ "include": "#expression-pin-action" },
@@ -575,31 +551,57 @@
 				{ "include": "#pattern-all" }
 			]
 		},
-		"expression-quote": {
+		"expression-if": {
+			"name": "meta.expression.if.musi",
+			"begin": "\\b(if)\\b",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "1": { "name": "keyword.control.conditional.musi" } },
 			"patterns": [
-				{
-					"name": "meta.expression.quote.musi",
-					"begin": "\\b(quote)\\b\\s*(\\{)",
-					"end": "\\}",
-					"beginCaptures": {
-						"1": { "name": "keyword.control.quote.musi" },
-						"2": { "name": "punctuation.section.block.begin.musi" }
-					},
-					"endCaptures": { "0": { "name": "punctuation.section.block.end.musi" } },
-					"patterns": [ { "include": "$self" } ]
-				},
-				{
-					"name": "meta.expression.quote.musi",
-					"begin": "\\b(quote)\\b\\s*(\\()",
-					"end": "\\)",
-					"beginCaptures": {
-						"1": { "name": "keyword.control.quote.musi" },
-						"2": { "name": "punctuation.section.parens.begin.musi" }
-					},
-					"endCaptures": { "0": { "name": "punctuation.section.parens.end.musi" } },
-					"patterns": [ { "include": "$self" } ]
-				}
+				{ "include": "#keyword-control-conditional" },
+				{ "include": "$self" }
 			]
+		},
+		"expression-match": {
+			"name": "meta.expression.match.musi",
+			"begin": "\\b(match)\\b",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "1": { "name": "keyword.control.conditional.musi" } },
+			"patterns": [
+				{ "include": "#pattern-all" },
+				{ "include": "#operator-match-arm" },
+				{ "include": "$self" }
+			]
+		},
+		"expression-defer": {
+			"name": "meta.expression.defer.musi",
+			"begin": "\\b(defer)\\b",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "1": { "name": "keyword.control.flow.musi" } },
+			"patterns": [ { "include": "$self" } ]
+		},
+		"expression-yield": {
+			"name": "meta.expression.yield.musi",
+			"begin": "\\b(yield)\\b",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "1": { "name": "keyword.control.flow.musi" } },
+			"patterns": [ { "include": "$self" } ]
+		},
+		"expression-lambda": {
+			"name": "meta.expression.lambda.musi",
+			"begin": "\\\\(?=\\s*\\()",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "0": { "name": "keyword.operator.lambda.musi" } },
+			"patterns": [
+				{ "include": "#signature-parameter-list" },
+				{ "include": "#type-annotation" },
+				{ "include": "#operator-match-arm" },
+				{ "include": "$self" }
+			]
+		},
+		"expression-export": {
+			"name": "meta.export.musi",
+			"match": "\\b(export)\\b",
+			"captures": { "1": { "name": "keyword.control.module.musi" } }
 		},
 		"expression-unsafe-block": {
 			"name": "meta.expression.unsafe.block.musi",
@@ -648,7 +650,7 @@
 		},
 		"expression-function-call": {
 			"name": "meta.function.call.musi",
-			"begin": "(?<!\\.)\\b(?!and\\b|answer\\b|any\\b|as\\b|ask\\b|catch\\b|comptime\\b|data\\b|effect\\b|export\\b|given\\b|handle\\b|if\\b|import\\b|in\\b|infix\\b|infixl\\b|infixr\\b|known\\b|law\\b|let\\b|match\\b|mut\\b|native\\b|not\\b|opaque\\b|or\\b|partial\\b|pin\\b|quote\\b|rec\\b|require\\b|resume\\b|shape\\b|shl\\b|shr\\b|some\\b|unsafe\\b|where\\b|xor\\b)([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\n]*\\]\\s*)?\\()",
+			"begin": "(?<!\\.)\\b(?!and\\b|as\\b|data\\b|defer\\b|else\\b|erased\\b|export\\b|hidden\\b|if\\b|import\\b|in\\b|known\\b|let\\b|match\\b|mut\\b|not\\b|or\\b|pin\\b|recur\\b|shape\\b|then\\b|unsafe\\b|where\\b|xor\\b|yield\\b)([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\n]*\\]\\s*)?\\()",
 			"end": "(?=\\s*\\()",
 			"beginCaptures": { "1": { "name": "entity.name.function.call.musi" } },
 			"patterns": [
@@ -683,23 +685,26 @@
 		},
 		"expression-pin-action": {
 			"name": "meta.expression.pin.musi",
-			"match": "\\b(pin)\\b",
-			"captures": { "1": { "name": "keyword.control.pin.musi" } }
+			"begin": "\\b(pin)\\b",
+			"end": "(?=\\s*(?:;|,|\\)|\\}|\\]|$))",
+			"beginCaptures": { "1": { "name": "keyword.control.pin.musi" } },
+			"patterns": [
+				{ "include": "#keyword-control-constraint" },
+				{ "include": "#keyword-operator-wordlike" },
+				{ "include": "$self" }
+			]
 		},
 		"keyword-all": {
 			"patterns": [
 				{ "include": "#keyword-storage-type" },
 				{ "include": "#keyword-declaration" },
-				{ "include": "#keyword-declaration-fixity" },
 				{ "include": "#keyword-storage-modifier" },
 				{ "include": "#keyword-type-modifier" },
-				{ "include": "#keyword-modifier" },
 				{ "include": "#keyword-control-unsafe" },
 				{ "include": "#keyword-control-pin" },
-				{ "include": "#keyword-control-effects" },
+				{ "include": "#keyword-control-flow" },
 				{ "include": "#keyword-control-conditional" },
 				{ "include": "#keyword-control-module" },
-				{ "include": "#keyword-control-quote" },
 				{ "include": "#keyword-control-constraint" },
 				{ "include": "#keyword-operator-wordlike" }
 			]
@@ -713,27 +718,19 @@
 		},
 		"keyword-storage-type": {
 			"name": "storage.type.musi",
-			"match": "\\b(shape|data|effect)\\b"
+			"match": "\\b(shape|data)\\b"
 		},
 		"keyword-declaration": {
 			"name": "keyword.declaration.musi",
-			"match": "\\b(given|law|let)\\b"
-		},
-		"keyword-declaration-fixity": {
-			"name": "keyword.declaration.fixity.musi",
-			"match": "\\b(infix|infixl|infixr)\\b"
+			"match": "\\blet\\b"
 		},
 		"keyword-storage-modifier": {
 			"name": "storage.modifier.musi",
-			"match": "\\b(native|mut|opaque|partial|rec)\\b"
+			"match": "\\b(erased|hidden|mut|recur)\\b"
 		},
 		"keyword-type-modifier": {
 			"name": "storage.modifier.type.musi",
-			"match": "\\b(any|some)\\b"
-		},
-		"keyword-modifier": {
-			"name": "keyword.modifier.musi",
-			"match": "\\b(comptime)\\b"
+			"match": "\\bknown\\b"
 		},
 		"keyword-control-unsafe": {
 			"name": "keyword.control.unsafe.musi",
@@ -743,41 +740,39 @@
 			"name": "keyword.control.pin.musi",
 			"match": "\\bpin\\b"
 		},
-		"keyword-control-effects": {
-			"name": "keyword.control.effects.musi",
-			"match": "\\b(answer|ask|handle|resume)\\b"
+		"keyword-control-flow": {
+			"name": "keyword.control.flow.musi",
+			"match": "\\b(defer|yield)\\b"
 		},
 		"keyword-control-conditional": {
 			"name": "keyword.control.conditional.musi",
-			"match": "\\b(if|match)\\b"
+			"match": "\\b(else|if|match|then)\\b"
 		},
 		"keyword-control-module": {
 			"name": "keyword.control.module.musi",
 			"match": "\\b(export|import)\\b"
 		},
-		"keyword-control-quote": {
-			"name": "keyword.control.quote.musi",
-			"match": "\\bquote\\b"
-		},
 		"keyword-control-constraint": {
 			"name": "keyword.control.constraint.musi",
-			"match": "\\b(as|require|where)\\b"
+			"match": "\\b(as|where)\\b"
 		},
 		"keyword-operator-wordlike": {
 			"name": "keyword.operator.wordlike.musi",
-			"match": "\\b(and|in|not|or|shl|shr|xor)\\b"
+			"match": "\\b(and|in|not|or|xor)\\b"
 		},
 		"operator-all": {
 			"patterns": [
 				{ "include": "#operator-assignment" },
-				{ "include": "#operator-typecheck" },
 				{ "include": "#operator-match-arm" },
+				{ "include": "#operator-fallback" },
 				{ "include": "#operator-equivalence" },
-				{ "include": "#operator-function-effect" },
 				{ "include": "#operator-function-pure" },
 				{ "include": "#operator-pipe" },
+				{ "include": "#operator-index-access" },
+				{ "include": "#operator-callable-access" },
 				{ "include": "#operator-spread" },
 				{ "include": "#operator-range" },
+				{ "include": "#operator-absence-failure" },
 				{ "include": "#operator-constraint" },
 				{ "include": "#operator-comparison" },
 				{ "include": "#operator-accessor" },
@@ -788,21 +783,17 @@
 			"name": "keyword.operator.assignment.musi",
 			"match": ":="
 		},
-		"operator-typecheck": {
-			"name": "keyword.operator.typecheck.musi",
-			"match": ":\\?>|:\\?"
-		},
 		"operator-match-arm": {
 			"name": "keyword.operator.match.arm.musi",
 			"match": "=>"
 		},
+		"operator-fallback": {
+			"name": "keyword.operator.fallback.musi",
+			"match": "\\?\\?"
+		},
 		"operator-equivalence": {
 			"name": "keyword.operator.equivalence.musi",
 			"match": "~="
-		},
-		"operator-function-effect": {
-			"name": "keyword.operator.function.effect.musi",
-			"match": "~>"
 		},
 		"operator-function-pure": {
 			"name": "keyword.operator.function.pure.musi",
@@ -812,6 +803,14 @@
 			"name": "keyword.operator.pipe.musi",
 			"match": "\\|>"
 		},
+		"operator-index-access": {
+			"name": "punctuation.accessor.index.musi",
+			"match": "\\.\\["
+		},
+		"operator-callable-access": {
+			"name": "punctuation.accessor.operator.musi",
+			"match": "\\.\\("
+		},
 		"operator-comparison": {
 			"name": "keyword.operator.comparison.musi",
 			"match": "/=|<=|>=|=|<|>"
@@ -820,13 +819,17 @@
 			"name": "keyword.operator.constraint.musi",
 			"match": "<:"
 		},
+		"operator-absence-failure": {
+			"name": "keyword.operator.type.sugar.musi",
+			"match": "\\?|!"
+		},
 		"operator-spread": {
 			"name": "keyword.operator.spread.musi",
 			"match": "\\.\\.\\."
 		},
 		"operator-range": {
 			"name": "keyword.operator.range.musi",
-			"match": "<\\.\\.<|<\\.\\.|\\.\\.<|\\.\\.(?!\\.)"
+			"match": "\\.\\.<|\\.\\.(?!\\.)"
 		},
 		"operator-accessor": {
 			"name": "punctuation.accessor.musi",
@@ -997,7 +1000,7 @@
 		},
 		"declaration-let-dot-callable": {
 			"name": "meta.declaration.dot-callable.musi",
-			"match": "\\b(let)\\b(?:\\s+(rec)\\b)?(?:\\s+(\\[[^\\]\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\n]*\\]\\s*)?\\(\\s*(?:comptime\\s+)?self\\s*:)",
+			"match": "\\b(let)\\b(?:\\s+(recur)\\b)?(?:\\s+(\\[[^\\]\\n]*\\]))?\\s+([a-z_][A-Za-z0-9_]*)\\b(?=\\s*(?:\\[[^\\]\\n]*\\]\\s*)?\\(\\s*self\\s*:)",
 			"captures": {
 				"1": { "name": "keyword.declaration.musi" },
 				"2": { "name": "storage.modifier.musi" },
@@ -1016,7 +1019,7 @@
 		"documentation-fenced-code-line": {
 			"patterns": [
 				{
-					"match": "(^\\s*(?:---|--!)\\s*)(let|law|given|infix|infixl|infixr)\\b",
+					"match": "(^\\s*(?:---|--!)\\s*)let\\b",
 					"captures": {
 						"1": { "name": "punctuation.definition.comment.documentation.musi" },
 						"2": { "name": "keyword.declaration.musi" }
@@ -1030,14 +1033,14 @@
 					}
 				},
 				{
-					"match": "(^\\s*(?:---|--!)\\s*)(shape|data|effect)\\b",
+					"match": "(^\\s*(?:---|--!)\\s*)(shape|data)\\b",
 					"captures": {
 						"1": { "name": "punctuation.definition.comment.documentation.musi" },
 						"2": { "name": "storage.type.musi" }
 					}
 				},
 				{
-					"match": "(^\\s*(?:---|--!)\\s*)(native|mut|opaque|partial|rec)\\b",
+					"match": "(^\\s*(?:---|--!)\\s*)(erased|hidden|mut|recur)\\b",
 					"captures": {
 						"1": { "name": "punctuation.definition.comment.documentation.musi" },
 						"2": { "name": "storage.modifier.musi" }
